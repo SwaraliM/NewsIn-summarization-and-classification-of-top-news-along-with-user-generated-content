@@ -1,0 +1,47 @@
+
+{% extends "base.html" %}
+{% block content %}
+    <div class="alice-bg section-padding-bottom">
+      <div class="container">
+        <div class="row">
+          <div class="col">
+            
+            <div class="blog-post-wrapper">
+            
+              {% for news in news_list %}
+              <article class="blog-list">
+                <div class="info">
+                  <span class="date">{{news['date'] | truncate(17, True, '') }}</span>
+                </div>
+                <div class="content">
+                  <h3><a href="">{{news['title']}}</a></h3>
+
+                  <p>{{news['content'] | news_summarizer}}</p>
+            
+                </div>
+                <div class="read-more">
+                  <a href="{{ news['src'] }}" class="button">Read More</a>
+                </div>
+              </article>
+              {% endfor %}
+              
+
+              <!-- <div class="pagination-list text-center">
+                <nav class="navigation pagination">
+                  <div class="nav-links">
+                    <a class="prev page-numbers" href="#"><i class="fas fa-angle-left"></i></a>
+                    <a class="page-numbers" href="#">1</a>
+                    <span aria-current="page" class="page-numbers current">2</span>
+                    <a class="page-numbers" href="#">3</a>
+                    <a class="page-numbers" href="#">4</a>
+                    <a class="next page-numbers" href="#"><i class="fas fa-angle-right"></i></a>
+                  </div>
+                </nav>                
+              </div> -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+{% endblock %}

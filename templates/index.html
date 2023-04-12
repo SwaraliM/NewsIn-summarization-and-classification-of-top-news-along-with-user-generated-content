@@ -1,0 +1,200 @@
+{% extends "base.html" %} {% block content %}
+<!-- Weather Banner -->
+
+<div class="container">
+  <div class="row" style="padding-top: 40px">
+    <div class="col-md-8 col-lg">
+    <div class="d-flex justify-content-lg-around">
+      <div class="alert alert-primary" role="alert">
+        Active Cases : {{ covid['active']}}
+       </div>
+      <div class="alert alert-info" role="alert">
+       Total Confirmed : {{ covid['confirmed']}}
+      </div>
+      <div class="alert alert-danger" role="alert">
+        Total Deaths : {{ covid['deaths']}}
+      </div>
+      <div class="alert alert-success" role="alert">
+        Total Recovered: {{ covid['recovered']}}
+      </div>
+      </div>
+      <article class="blog-grid" style="border: solid 0.2px #246df8">
+        <div class="body">
+          <span class="date">{{day}} <span>{{month}}</span> </span>
+          <h3>Mumbai,India</h3>
+          <p>
+            Tempreature: {{weather_data["celcius"]}}&deg;
+            &ensp;Humidity:{{weather_data["humidity"]}} &ensp;
+            {{weather_data["desc"]}}
+          </p>
+        </div>
+
+      </article>
+    </div>
+  </div>
+</div>
+
+<!-- End Weather Banner -->
+
+<!-- Headlines -->
+<div class="container">
+  <marquee>{{headlines}}</marquee>
+</div>
+<!-- end headlines -->
+<!-- News -->
+
+
+<div class="alice-bg">
+  <div class="container">
+    <div class="row">
+      <div class="col">
+        <div
+          class="section-header section-header-2 section-header-with-right-content"
+        >
+          <h2>Recent News</h2>
+          <a href="/news" class="header-right">+ Browse All News</a>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col">
+        {% for news in newslist %}
+        <article class="blog-list">
+          <div class="info">
+            <!-- <span class="date">21th Nov,  2020</span>
+                <span class="author"><a href="#"><i data-feather="user"></i>Robert Karlos</a></span>
+                <span class="comments"><i data-feather="message-circle"></i>42</span> -->
+
+           
+              <img
+                src="{{news['image']}}"
+                class="img-fluid"
+                alt=""
+              />
+              {% if news['content'] | classifyNews == 'REAL' %}
+              <span style="margin-top: 10px;" class="alert alert-success">
+              <center> <strong style="text-align: center;">News is Real</strong></center>
+              </span>
+              {% else %}
+              <span style="margin-top: 10px;" class="alert alert-danger">
+                <center><strong >News is Fake</strong></center>
+              </span>    
+              {% endif %}
+          </div>
+          <div class="content" style="padding-left: 10px;">
+            <h3>
+              <a href="">{{news['title']}}</a>
+            </h3>
+          {{news['content'] | news_summarizer  }}
+          <hr>
+          <span id="success" style="display: none;" class="alert alert-success">
+            <center><strong>Added to read later!!!</strong></center>
+          </span>
+          <span id="failed" style="display: none;"  class="alert alert-danger">
+          <center>  <strong>Some Error! While Adding.</strong></center>
+          </span>
+          </div>
+          <div class="read-more">
+          
+              
+            <a href="/at-rl/{{news['id']}}" class="button rl">Read later</a>
+            
+      
+            <button style="margin-top: 5px;" class="button"><a href="{{  news['src'] }}">Read More</a> </button>
+
+
+
+            <br />
+            <p style="padding-top: 5px" class="deadline">
+              {{news['date']}}
+            </p>
+          </div>
+        </article>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+<!-- News End -->
+<div class="container">
+  <div class="row">
+    <div class="col">
+      <h3> NewsIn Media</h3>
+      <amp-story-player style="width: 100%; height: 600px;">
+        <a
+          href="/web-stories">
+          Stories in AMP - Hello World
+        </a>
+  
+      </amp-story-player>
+    </div>
+
+  
+  </div>
+</div>
+
+
+<!-- Top Categories -->
+<div class="section-padding-top">
+  <div class="container">
+    <div class="row">
+      <div class="col">
+        <div class="section-header">
+          <h2>Top Categories</h2>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col">
+        <div class="company-carousel owl-carousel">
+          {% for category in categorylist %}
+          <div class="company-wrap">
+            <div class="thumb">
+              <a href="#">
+                <img
+                  src="{{category['image']}}"
+                  class="img-fluid"
+                  alt=""
+                />
+              </a>
+            </div>
+            <div class="body">
+              <h4><a href="/category/{{category['name']}}">{{category['name']|upper}}</a></h4>
+              
+              <a href="/category/{{category['name']}}" class="button">{{ range(1, 10) | random }} News</a>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Top Categories End -->
+{% endblock %}
+{% block extrascript %}
+<script>
+//This Scripts adds data to the fav and readlater
+  $("a.button, .rl").click(function(e) {
+    e.preventDefault(); // avoid to execute the actual submit of the form.   
+    $.ajax({
+           type: "POST",
+           url: $(this).attr("href"),
+           // serializes the form's elements.
+           success: function(data)
+           {
+            
+               $("#success").show().fadeOut(3000,()=>{$('#success').hide()})// show response
+           },
+           error:function(data)
+           {
+                $('#failed').next().show().fadeOut(3000,()=>{$('#failed').hide()})// show response
+                //console.log(data)
+           }          
+         });
+  });
+</script>
+<script src="/static/app.js"></script>
+
+
+{% endblock %}

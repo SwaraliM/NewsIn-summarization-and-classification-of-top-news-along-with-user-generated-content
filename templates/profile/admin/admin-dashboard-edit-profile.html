@@ -1,0 +1,254 @@
+{% set active_page = 'editaccount' %}
+
+{% extends "profile/admin/admin-dashboard.html" %}
+{% block dashboardsection %}
+
+                  <form id="1" action="/addProfImg" method="POST"  class="dashboard-form" enctype="multipart/form-data">
+                    <div class="dashboard-section upload-profile-photo">
+                      <div class="update-photo">
+                        <img class="image" src="{{session['user_img']}}" alt="">
+                      </div>
+                      <div class="file-upload">            
+                        <input type="file" name="image" class="file-input">Change Avatar
+                      </div>
+                      
+                    </div>
+                    <div class="form-group row">
+                      <label class="col-sm-3 col-form-label"></label>
+                      <div class="col-sm-9">
+                        <input type="submit" class="button" value="Update Profile">
+                      </div>
+                      <span id="success1" style="display: none;" class="alert alert-success">
+                        <center><strong>Update Success</strong></center>
+                      </span>
+                      <span id="failed1" style="display: none;"  class="alert alert-danger">
+                      <center>  <strong>Some Error!</strong></center>
+                      </span>
+                    </div>
+                  </form>
+                    <form id="2" method="POST" action="/update-basicinfo" class="dashboard-form">
+                      <div class="dashboard-section basic-info-input">
+                        <h4><i data-feather="user-check"></i>Basic Info</h4>
+                        <div class="form-group row">
+                          <label class="col-sm-3 col-form-label">Full Name</label>
+                          <div class="col-sm-9">
+                            <input type="text" name="fname" class="form-control" value="{{session['name']}}">
+                          </div>
+                        </div>
+                        <div class="form-group row">
+                          <label class="col-sm-3 col-form-label">Email Address</label>
+                          <div class="col-sm-9">
+                            <input type="text" class="form-control" placeholder="{{session['email']}}" readonly>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="form-group row">
+                        <label class="col-sm-3 col-form-label"></label>
+                        <div class="col-sm-9">
+                          <input type="submit" class="button" value="Update Name">
+                        </div>
+                        <span id="success2" style="display: none;" class="alert alert-success">
+                          <center><strong>Update Success</strong></center>
+                        </span>
+                        <span id="failed2" style="display: none;"  class="alert alert-danger">
+                        <center>  <strong>Some Error!</strong></center>
+                        </span>
+                      </div>
+                    </form>
+
+                    <!-- <div class="form-group row">
+                      <label class="col-sm-3 col-form-label">Phone</label>
+                      <div class="col-sm-9">
+                        <input name="f" type="text" class="form-control" placeholder="+55 123 4563 4643">
+                      </div>
+                    </div>
+                    <div class="form-group row">
+                      <label class="col-sm-3 col-form-label">Address</label>
+                      <div class="col-sm-9">
+                        <input type="text" class="form-control" placeholder="Washington D.C">
+                      </div>
+                    </div> -->
+                    <!-- <div class="form-group row">
+                      <label class="col-sm-3 col-form-label">Category</label>
+                      <div class="col-sm-9">
+                        <input type="text" class="form-control" placeholder="UI & UX Designer">
+                      </div>
+                    </div>
+                    <div class="form-group row">
+                      <label class="col-sm-3 col-form-label">About Us</label>
+                      <div class="col-sm-9">
+                        <textarea class="form-control" placeholder=""></textarea>
+                      </div>
+                    </div> -->
+                  
+                  <!-- <div class="dashboard-section media-inputs">
+                    <h4><i data-feather="image"></i>Photo &amp; Video</h4>
+                    <div class="form-group row">
+                      <label class="col-sm-3 col-form-label">Intro Video</label>
+                      <div class="col-sm-9">
+                        <div class="input-group">
+                          <div class="input-group-prepend">
+                            <div class="input-group-text">Link</div>
+                          </div>
+                          <input type="text" class="form-control" placeholder="https://www.youtube.com/watch?v=ZRkdyjJ_489M">
+                        </div>
+                      </div>
+                    </div>
+                    <div class="form-group row">
+                      <label class="col-sm-3 col-form-label">Gallery</label>
+                      <div class="col-sm-9">
+                        <div class="input-group image-upload-input">
+                          <div class="input-group-prepend">
+                            <div class="input-group-text">Image</div>
+                          </div>
+                          <div class="active">
+                            <div class="upload-images">
+                              <div class="pic">
+                                <span class="ti-plus"></span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div> -->
+                  <form id="3" method="POST" action="/social-links" class="dashboard-form">
+                  <div class="dashboard-section social-inputs">
+                    <h4><i data-feather="cast"></i>Social Networks</h4>
+                    <div class="form-group row">
+                      <label class="col-sm-3 col-form-label">Social Links</label>
+                      <div class="col-sm-9">
+                        <div class="input-group">
+                          <div class="input-group-prepend">
+                            <div class="input-group-text"><i class="fab fa-facebook-f"></i></div>
+                          </div>
+                          <input type="text" name="facebook" class="form-control" value="{{social['facebook']}}">
+                        </div>
+                      </div>
+                    </div>
+                    <div class="form-group row">
+                      <div class="offset-sm-3 col-sm-9">
+                        <div class="input-group">
+                          <div class="input-group-prepend">
+                            <div class="input-group-text"><i class="fab fa-twitter"></i></div>
+                          </div>
+                          <input type="text" name="twitter" class="form-control" value="{{social['twitter']}}">
+                        </div>
+                      </div>
+                    </div>
+                    <div class="form-group row">
+                      <div class="offset-sm-3 col-sm-9">
+                        <div class="input-group">
+                          <div class="input-group-prepend">
+                            <div class="input-group-text"><i class="fab fa-google-plus"></i></div>
+                          </div>
+                          <input type="text" name="google" class="form-control" value="{{social['google']}}">
+                        </div>
+                      </div>
+                    </div>
+                    <div class="form-group row">
+                      <div class="offset-sm-3 col-sm-9">
+                        <div class="input-group">
+                          <div class="input-group-prepend">
+                            <div class="input-group-text"><i class="fab fa-linkedin"></i></div>
+                          </div>
+                          <input type="text" name="linkedin" class="form-control" value="{{social['linkedin']}}">
+                        </div>
+                      </div>
+                    </div>
+                    <div class="form-group row">
+                      <div class="offset-sm-3 col-sm-9">
+                        <div class="input-group">
+                          <div class="input-group-prepend">
+                            <div class="input-group-text"><i class="fab fa-instagram"></i></div>
+                          </div>
+                          <input type="text" name="instagram" class="form-control" value="{{social['instagram']}}">
+                        </div>
+                      </div>
+                    </div>
+    
+                  </div>
+                  <div class="form-group row">
+                    <label class="col-sm-3 col-form-label"></label>
+                    <div class="col-sm-9">
+                      <input type="submit" class="button" value="Save Changes">
+                    </div>
+                    <span id="success3" style="display: none;" class="alert alert-success">
+                      <center><strong>Update Success</strong></center>
+                    </span>
+                    <span id="failed3" style="display: none;"  class="alert alert-danger">
+                    <center>  <strong>Some Error!</strong></center>
+                    </span>
+                  </div>
+                </form>
+                  <form id="4" action="/change-password" method="POST" class="dashboard-form">
+                    <div class="dashboard-section basic-info-input">
+                      <h4><i data-feather="lock"></i>Change Password</h4>
+                      <div class="form-group row">
+                        <label class="col-sm-3 col-form-label">Current Password</label>
+                        <div class="col-sm-9">
+                          <input type="password" name="password" class="form-control" placeholder="Current Password">
+                        </div>
+                      </div>
+                      <div class="form-group row">
+                        <label class="col-sm-3 col-form-label">New Password</label>
+                        <div class="col-sm-9">
+                          <input type="password" name="newpassword" class="form-control" placeholder="New Password">
+                        </div>
+                      </div>
+                      <div class="form-group row">
+                        <label class="col-sm-3 col-form-label">Retype Password</label>
+                        <div class="col-sm-9">
+                          <input type="password" class="form-control" placeholder="Retype Password">
+                        </div>
+                      </div>
+                      <div class="form-group row">
+                        <label class="col-sm-3 col-form-label"></label>
+                        <div class="col-sm-9">
+                          <input type="submit" class="button" value="Save Changes">
+                        </div>
+                        <span id="success4" style="display: none;" class="alert alert-success">
+                          <center><strong>Update Success</strong></center>
+                        </span>
+                        <span id="failed4" style="display: none;"  class="alert alert-danger">
+                        <center>  <strong>Some Error!</strong></center>
+                        </span>
+                      </div>
+                    </div>
+                  </form>
+             {% endblock %}
+             
+{% block customscript  %}
+<script>
+// this is the id of the form
+$(".dashboard-form").submit(function(e) {
+
+    e.preventDefault(); // avoid to execute the actual submit of the form.
+
+    var form = $(this);
+    var url = form.attr('action');
+    var formData = new FormData(this)
+    var id = form.attr('id');
+    console.log(id);
+    
+    $.ajax({
+           type: "POST",
+           url: url,
+           data: formData, // serializes the form's elements.
+           success: function(data)
+           {
+            $("#success" + id).show().fadeOut(3000,()=>{$('#success'+id).hide()})// show response
+             
+            console.log(data)
+           },           
+           cache: false,
+           contentType: false,
+           processData: false,
+           error: function(){
+            $("#failed" + id).show().fadeOut(3000,()=>{$('#failed'+id).hide()})// show response
+            console.log(data)
+           }
+         });   
+});
+</script>
+{% endblock %}

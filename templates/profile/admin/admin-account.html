@@ -1,0 +1,55 @@
+{% set active_page = 'admindash' %}
+
+{% extends "profile/admin/admin-dashboard.html" %}
+{% block dashboardsection %}
+
+                <!-- <div class="dashboard-section user-statistic-block">
+                  <div class="user-statistic">
+                    <i data-feather="command"></i>
+                    <h3>06</h3>
+                    <span>News Published</span>
+                  </div>
+                  <div class="user-statistic">
+                    <i data-feather="file-text"></i>
+                    <h3>123</h3>
+                    <span>Total Views</span>
+                  </div>
+                  <div class="user-statistic">
+                    <i data-feather="users"></i>
+                    <h3>32</h3>
+                    <span>Total Comments</span>
+                  </div>
+                </div> -->
+                <!-- <div class="dashboard-section dashboard-view-chart">
+                  <canvas id="view-chart" width="400" height="200"></canvas>
+                </div> -->
+                <div class="dashboard-section dashboard-recent-activity">
+                  <h4 class="title">Recently Published News</h4>
+                  {% if newslist|length > 0 %}
+                  <!-- For loop here -->
+                  {% for news in newslist %}
+                  <div class="activity-list">
+                    <!-- <i class="fas fa-bolt"></i> -->
+                    <div class="content">
+                      <h5>{{ news['title'] }}</h5>
+                      <span class="time">{{ news['published_date'] }}</span>
+                    </div>
+                    <div class="close-activity">
+                      
+                      <a href="/editnews/{{news['id']}}"> <i class="fas fa-edit"></i> </a>
+                    </div>
+                  </div>
+                  {% endfor %}
+                  {% else %}
+                  <div class="activity-list">
+                    <!-- <i class="fas fa-bolt"></i> -->
+                    <div class="content">
+                      <h5>No news published by you</h5>
+                    </div>
+
+                  </div>
+                  {% endif %}
+
+                  <!-- For loop Ends here -->
+                </div>
+            {% endblock %}

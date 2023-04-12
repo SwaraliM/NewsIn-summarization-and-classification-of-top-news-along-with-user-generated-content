@@ -1,0 +1,92 @@
+{% set active_page = 'editnews' %}
+
+{% extends "profile/admin/admin-dashboard.html" %}
+{% block dashboardsection %}
+                <div class="manage-job-container">
+                  <table class="table">
+                    <thead>
+                      <tr>
+                        <th>Title</th>
+                        <!-- <th>Views</th> -->
+                        <th>Published</th>
+                        
+                        <th class="action">Action</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {% if newslist|length > 0 %}
+
+                      {% for news in newslist %}
+                      <tr class="job-items" id="{{news['id']}}">
+                        <td class="title">
+                          <h5><a href="/dp/{{news['category']}}/{{news['slug']}}">{{news['title']}}</a></h5>
+ 
+                        </td>
+                        <!-- <td class="application"><a href="#">6</a></td> -->
+                        <td class="deadline">{{news['date']}}</td>
+                        
+                        <td class="action">
+                          <a href="/dp/{{news['category']}}/{{news['slug']}}" target="_blank" class="preview" title="Preview"><i data-feather="eye"></i></a>
+                          <a href="/editnews/{{news['id']}}" target="_blank" class="edit" title="Edit"><i data-feather="edit"></i></a>
+                          <a href="/delete-news/{{news['id']}}"  class="remove" title="Delete"><i data-feather="trash-2"></i></a>
+                        </td>
+                      </tr>
+                      {% endfor %}
+                      {% else %}
+                      <tr class="job-items" >
+                        <td class="title">
+                          <h5>No news to manage, publish now!</h5>
+ 
+                        </td>
+                        <!-- <td class="application"><a href="#">6</a></td> -->
+                        <td class="deadline">--------</td>
+                        
+                        <td class="action">
+                          --------
+                        </td>
+                      </tr>
+                      {% endif %}
+                    </tbody>
+                  </table>
+
+                  <!-- <div class="pagination-list text-center">
+                    <nav class="navigation pagination">
+                      <div class="nav-links">
+                        <a class="prev page-numbers" href="#"><i class="fas fa-angle-left"></i></a>
+                        <a class="page-numbers" href="#">1</a>
+                        <span aria-current="page" class="page-numbers current">2</span>
+                        <a class="page-numbers" href="#">3</a>
+                        <a class="page-numbers" href="#">4</a>
+                        <a class="next page-numbers" href="#"><i class="fas fa-angle-right"></i></a>
+                      </div>
+                    </nav>                
+                  </div> -->
+
+                </div>
+         
+{% endblock %}
+{% block customscript %}
+<script>
+  $(".remove").click(function(e) {
+    e.preventDefault(); // avoid to execute the actual submit of the form.   
+    var trid = $(this).closest('tr').attr('id'); // table row ID
+    $.ajax({
+           type: "POST",
+           url: $(this).attr("href"),
+           // serializes the form's elements.
+           success: function(data)
+           {
+             $('#'+trid).remove();
+             console.log("Done")
+             //$(this).animate({"background-color":"hotpink"},4000).show(1000);
+              // $(this).next().next().show().fadeOut(3000,()=>{$('#success').hide()})// show response
+           },
+           error:function(data)
+           {
+                //$(this).next().next().next().show().fadeOut(3000,()=>{$('#failed').hide()})// show response
+                console.log(data)
+           }          
+         });
+  });
+</script>
+{% endblock %}

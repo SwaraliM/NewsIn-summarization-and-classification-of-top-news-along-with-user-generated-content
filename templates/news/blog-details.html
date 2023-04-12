@@ -1,0 +1,396 @@
+{% extends "base.html" %}
+{% block content %}
+
+
+
+    <div class="alice-bg  section-padding-bottom">
+      <div id="newsoffline" class="container">
+
+        <div class="row">
+          
+          <div class="col">
+
+            <div class="blog-post-details-container">
+              <div class="blog-details-wrapper">
+                <!-- <div class="info">
+                  <span class="date">{{news['date']}}</span>
+                  <span class="author"><a href="#"><i data-feather="user"></i>{{news['authorname']}}</a></span>
+                  <span class="comments"><i data-feather="message-circle"></i>{{comments|length}}</span>
+
+
+                </div> -->
+                <div class="post-content">
+                  <input type="hidden" id="news_atfav" value="{{news['id']}}">
+
+                  <h2 id="title" >{{news['title']}}</h2>
+                 
+                  <img src="{{news['headerimg']}}" class="img-fluid" alt="">
+
+<div id="news-real-content">
+  {{ news['content'] | safe }}
+
+</div>
+
+                  <div class="job-title-and-info" style="padding: 30px;">
+                    <div class="buttons">
+                      
+
+                      <a class="save" href="/at-fav/{{news['id']}}"><i data-feather="heart"></i>Add to favourite </a>
+                      <span class="job-apply-buttons" >
+                      <a href="#" class="email"><i data-feather="download"></i>Save Pdf</a>
+                      <button onclick="createDB()" class="email"><i data-feather="download"></i>Save Offile</button>
+                      
+                      
+
+                      </span>
+                    </div>
+              
+                  </div>
+                  <div class="job-title-and-info" >
+                    <button type="button" 
+                      style=' background: #246df8;
+                      color: #ffffff;
+                      font-family: "Poppins", sans-serif;
+                      font-weight: 500;
+                      padding: 11px 20px;' id="listen-content" value="{{ session['language'] }}">
+                       <i class="fa fa-play"></i> Play</button>
+                      <button
+                      style=' background: #246df8;
+                      color: #ffffff;
+                      font-family: "Poppins", sans-serif;
+                      font-weight: 500;
+                      padding: 11px 20px;''
+                      id="resume" > <i class="fa fa-play-circle"></i> Resume</button>
+                      <button
+                    style=' background: #246df8;
+                    color: #ffffff;
+                    font-family: "Poppins", sans-serif;
+                    font-weight: 500;
+                    padding: 11px 20px;''
+                    id="paused" > <i class="fa fa-pause"></i> Pause</button>
+                    <button
+                    style=' background: #246df8;
+                    color: #ffffff;
+                    font-family: "Poppins", sans-serif;
+                    font-weight: 500;
+                    padding: 11px 20px;''
+                    id="stop" > <i class="fa fa-stop"></i> Stop</button>
+                  </div>
+                </div>
+                
+              </div>
+
+              <div class="post-meta">
+                <div class="post-author">
+                  <div class="avatar">
+                    <img src="{{news['authorimg']}}" class="img-fluid" alt="">
+                  </div>
+                  <div class="name">
+                    <p>News By</p>
+                    <h5><a href="#" id="authorname">{{news['authorname']}}</a></h5>
+                  </div>
+                </div>
+
+                <div class="post-tag">
+                  {% set tags = news['tags'].split(',') %}
+                  <h6>News Tag </h6>
+                  <div class="tags">
+                  {% for tag in tags %}
+                  <a href="#">{{tag}}</a>
+                  {% endfor %}
+                  </div>
+                </div>
+
+                <div class="post-share">
+                  <h6>Follow Editor</h6>
+                  <div class="social-buttons">
+                    <a href="{{news['facebook']}}" class="facebook"><i class="fab fa-facebook-f"></i></a>
+                    <a href="{{news['twitter']}}" class="twitter"><i class="fab fa-twitter"></i></a>
+                    <a href="{{news['google']}}" class="google"><i class="fab fa-google-plus-g"></i></a>
+                    <a href="{{news['linkedin']}}" class="linkedin"><i class="fab fa-linkedin-in"></i></a>                  
+                    <a href="{{news['instagram']}}" class="instagram"><i class="fab fa-instagram"></i></a>
+                  </div>
+                </div>
+              </div>
+
+              <div class="post-comment-block">
+                <!-- Write Comment Area -->
+                {% if session['user_id'] %}
+
+                <div class="comment-respond">
+                  <h4>Write A Comment</h4>
+
+                  <form id="Addcomment" action="/add-comment" method="POST">
+                    <div class="row">
+                      <div class="col-md-12">
+                        <div class="form-group">
+                          <input type="text" value="{{session['name']}}" class="form-control" readonly maxlength="255">
+                        </div>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-md-12">
+                        <div class="form-group">
+                          <input type="hidden" name="news_id" value="{{news['id']}}">
+                          <textarea name="comment" placeholder="Comment" class="form-control"></textarea>
+                        </div>
+                         </div>
+                    </div>
+                    <input type="submit" class="button primary-bg" value="Submit">
+                  </form>
+
+                </div>
+                  {%else%}
+                  <div class="comment-respond">
+                    <h4>Login to Comment</h4>
+  
+                    <form id="Addcomment" action="/login" method="POST">
+                      <div class="row">
+                        <div class="col-md-12">
+                          <div class="form-group">
+                            <input type="email" name="email" placeholder="Email Address" class="form-control">
+                          </div>
+
+                        </div>
+                      </div>
+                      <div class="row">
+                        <div class="col-md-12">
+                          <div class="form-group">
+                            <div class="form-group">
+                              <input type="password" name="password" placeholder="Password" class="form-control">
+                            </div>
+                          </div>
+                           </div>
+                      </div>
+                      <input type="submit" class="button primary-bg" value="Login">
+                    </form>
+  
+                  </div>
+                {% endif %}
+                <!-- List comments Area -->
+                <div class="comment-area">
+
+                  <h4>{{comments|length}} Comments</h4>
+                  <ul class="comments">
+                    {% for comment in comments %}
+                    <li class="comment">
+                      <div class="comment-wrap">
+                        <div class="comment-info">
+                          <div class="commenter-thumb">
+                            <img src="{{comment['user_img']}}" class="img-fluid" alt="">
+                          </div>
+                          <div class="commenter-info">
+                            <span class="commenter-name">{{comment['name']}}</span>
+                            <span class="date">{{comment['timestamp']}}</span>
+                          </div>
+<!-- Sentiment -->
+                          <div class="reply">
+                            {% if comment['sentiment'] == 'Positive' %}
+                            <button type="button" class="btn btn-success" >{{comment['sentiment']}}</button>
+                            {% elif comment['sentiment'] == 'Negative' %}
+                            <button type="button" class="btn btn-danger" >{{comment['sentiment']}}</button>
+                            {% else%}
+                            <button type="button" class="btn btn-info" >{{comment['sentiment']}}</button>
+                            {% endif %}
+                            <!-- Show only whos comment it -->
+                            
+                            {% if comment['user_id'] == session['user_id'] %}
+                            <button type="button" id="{{comment['id']}}" class="reply-button" >Delete</button>
+                            {% endif %}
+                          </div>
+
+                        </div>
+                        <div class="comment-body">
+<p>{{comment['comment']}}</p>
+                        </div>
+                      </div>
+
+                    </li>
+{% endfor %}
+                  </ul>
+                  <!-- <div class="view-all">
+                    <a href="#">View all comments</a>
+                  </div> -->
+                </div>
+              </div>
+
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="editor"></div>
+{% endblock %}
+{% block extrascript %}
+<script>
+
+
+// this is the id of the form
+$("#Addcomment").submit(function(e) {
+
+    e.preventDefault(); // avoid to execute the actual submit of the form.
+
+    var form = $(this);
+    var url = form.attr('action');
+    
+    $.ajax({
+           type: "POST",
+           url: url,
+           data: form.serialize(), // serializes the form's elements.
+           success: function(data)
+           {
+              console.log(data); // show response from the php script.
+              window.location.reload();
+           }
+         }); 
+});
+
+$('.reply-button').click(function(){
+
+  
+  var data = $(this).attr("id")
+  console.log(data)
+  $.ajax
+  ({ 
+      url: '/delete-comment',
+      data: {"comment_id": data},
+      type: 'POST',
+      success: function(result)
+      {
+        console.log("done")
+        window.location.reload();
+
+      },
+      error: function(e){
+        console.log("error")
+      }
+  });
+});
+
+$('a.save').click(function(e){
+  e.preventDefault();
+
+  $.ajax({ 
+  url: $(this).attr('href'),
+  success: function(e){
+    $('a.save').text("Added To Favourite").removeAttr('href')
+    console.log(e)
+  },
+  error: function(e){
+    console.log(e)
+  }
+  });
+  return false;
+  });
+
+  $(document).ready(function(){
+//Save Offline Code goes here
+var doc = jsPDF();
+var specialElementHandlers = {
+    '#newsoffline': function (element, renderer) {
+        return true;
+    }
+};
+
+$('a.email').click(function () {
+  alert("This will take 5 seconds! Thanks for Downloading!!!!")
+    doc.fromHTML($('#newsoffline').html(), 15, 15, {
+        'width': 170,
+        'elementHandlers': specialElementHandlers
+    });
+    filename = $("#title").text()
+    setTimeout(function(){
+      doc.save(filename + '.pdf');
+      },5000);
+});
+
+  });
+
+  $("#listen-content").click(function(){
+  var msg = new SpeechSynthesisUtterance();
+
+    content = $("#news-real-content").children("p").text();
+    console.log(content)
+    msg.text = content;
+    window.speechSynthesis.speak(msg);
+//$('#paused').removeAttr('disabled');
+    //$('#stop').removeAttr('disabled');
+   
+
+  });
+$('#paused').click(function(){
+  window.speechSynthesis.pause();
+//$('#stop').removeAttr('disabled');
+ // $('#resume').removeAttr('disabled');
+
+ // $('#listen-content').prop('disabled',true);
+
+});
+
+$('#resume').click(function(){
+  window.speechSynthesis.resume()
+ // $('#listen-content').removeAttr('disabled');
+ // $('#paused').removeAttr('disabled');
+ // $('#stop').removeAttr('disabled');
+
+});
+$('#stop').click(function(){
+  window.speechSynthesis.cancel();
+  //$('#listen-content').removeAttr('disabled');
+
+ // $('#resume').prop('disabled',true);
+  //$('#stop').prop('disabled',true);
+  //$('#paused').prop('disabled',true);
+
+});
+</script>
+
+<script src="/app.js"></script>
+
+
+<script>
+  function createDB() {
+
+  let db = null
+  
+  request = indexedDB.open('InshortBharat', 3);
+  request.onupgradeneeded = e => {
+           // ### called whenever the DB changes version. triggers when the DB is created ###
+           db = e.target.result
+           store = db.createObjectStore('articles', {keyPath: 'id', autoIncrement: true})
+           
+           console.log('Database created or upgraded.')
+  }
+    request.onsuccess = e =>{
+    // ### called when the connection with the DB is opened successfully ###
+    db = request.result
+    console.log('Database connection opened.')
+    
+    // ### open a transaction ###
+    tx = db.transaction('articles', 'readwrite')
+    store = tx.objectStore('articles')
+     
+   let name = $("#authorname").text()
+   let title = $("#title").text()
+   let content = $("news-real-content").children("p").text()
+    const news = {
+    name,
+    title,
+    content  
+ 
+    }
+    // ### store a new record with the current timestamp ###
+    // now = new Date()
+    store.add(news)
+    
+    
+    
+
+
+  }
+}
+
+
+</script>
+{% endblock %}

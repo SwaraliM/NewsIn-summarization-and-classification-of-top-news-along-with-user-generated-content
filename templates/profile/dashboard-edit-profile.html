@@ -1,0 +1,145 @@
+
+{% set active_page = 'editaccount' %}
+{% extends "profile/dashboard.html" %}
+{% block dashboardsection%}
+   
+
+    <!-- <div class="alice-bg section-padding-bottom">
+      <div class="container no-gliters">
+        <div class="row no-gliters">
+          <div class="col">
+            <div class="dashboard-container">
+              <div class="dashboard-content-wrapper"> -->
+                
+                
+                <form id="1" action="/addProfImg" method="POST"  class="dashboard-form" enctype="multipart/form-data">
+                  <div class="dashboard-section upload-profile-photo">
+                    <div class="update-photo">
+                      <img class="image" src="{{session['user_img']}}" alt="">
+                    </div>
+                    <div class="file-upload">            
+                      <input type="file" name="image" class="file-input">Change Avatar
+                    </div>
+                    
+                  </div>
+                  <div class="form-group row">
+                    <label class="col-sm-3 col-form-label"></label>
+                    <div class="col-sm-9">
+                      <input type="submit" class="button" value="Update Profile">
+                    </div>
+                    <span id="success1" style="display: none;" class="alert alert-success">
+                      <center><strong>Update Success</strong></center>
+                    </span>
+                    <span id="failed1" style="display: none;"  class="alert alert-danger">
+                    <center>  <strong>Some Error!</strong></center>
+                    </span>
+                  </div>
+                </form>
+               
+                <form id="2" method="POST" action="/update-basicinfo" class="dashboard-form">
+                  <div class="dashboard-section basic-info-input">
+                    <h4><i data-feather="user-check"></i>Basic Info</h4>
+                    <div class="form-group row">
+                      <label class="col-sm-3 col-form-label">Full Name</label>
+                      <div class="col-sm-9">
+                        <input type="text" name="fname" class="form-control" placeholder="Full Name">
+                      </div>
+                    </div>
+                    <div class="form-group row">
+                      <label class="col-sm-3 col-form-label">Email Address</label>
+                      <div class="col-sm-9">
+                        <input type="text" class="form-control" placeholder="{{session['email']}}" readonly>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="form-group row">
+                    <label class="col-sm-3 col-form-label"></label>
+                    <div class="col-sm-9">
+                      <input type="submit" class="button" value="Update Name">
+                    </div>
+                    <span id="success2" style="display: none;" class="alert alert-success">
+                      <center><strong>Update Success</strong></center>
+                    </span>
+                    <span id="failed2" style="display: none;"  class="alert alert-danger">
+                    <center>  <strong>Some Error!</strong></center>
+                    </span>
+                  </div>
+                </form>
+              
+                <form id="3" action="/change-password" method="POST" class="dashboard-form">
+                  <div class="dashboard-section basic-info-input">
+                    <h4><i data-feather="lock"></i>Change Password</h4>
+                    <div class="form-group row">
+                      <label class="col-sm-3 col-form-label">Current Password</label>
+                      <div class="col-sm-9">
+                        <input type="password" name="password" class="form-control" placeholder="Current Password">
+                      </div>
+                    </div>
+                    <div class="form-group row">
+                      <label class="col-sm-3 col-form-label">New Password</label>
+                      <div class="col-sm-9">
+                        <input type="password" name="newpassword" class="form-control" placeholder="New Password">
+                      </div>
+                    </div>
+                    <div class="form-group row">
+                      <label class="col-sm-3 col-form-label">Retype Password</label>
+                      <div class="col-sm-9">
+                        <input type="password" class="form-control" placeholder="Retype Password">
+                      </div>
+                    </div>
+                    <div class="form-group row">
+                      <label class="col-sm-3 col-form-label"></label>
+                      <div class="col-sm-9">
+                        <input type="submit" class="button" value="Save Changes">
+                      </div>
+                      <span id="success3" style="display: none;" class="alert alert-success">
+                        <center><strong>Update Success</strong></center>
+                      </span>
+                      <span id="failed3" style="display: none;"  class="alert alert-danger">
+                      <center>  <strong>Some Error!</strong></center>
+                      </span>
+                    </div>
+                  </div>
+                </form>
+                
+              </div>
+             
+
+{% endblock %}
+
+{% block extrascript%}
+<script>
+// this is the id of the form
+$(".dashboard-form").submit(function(e) {
+    
+    e.preventDefault(); // avoid to execute the actual submit of the form.
+   
+    var form = $(this);
+    var id = form.attr('id');
+    var url = form.attr('action');
+    var formData = new FormData(this)
+    console.log(id);
+    
+    $.ajax({
+           type: "POST",
+           url: url,
+           data: formData, // serializes the form's elements.
+           success: function(data)
+           {
+            $("#success" + id).show().fadeOut(3000,()=>{$('#success'+id).hide()})// show response
+             
+            console.log(data)
+
+           },           
+           cache: false,
+           contentType: false,
+           processData: false,
+           error:function(data){
+            $("#failed" + id).show().fadeOut(3000,()=>{$('#failed'+id).hide()})// show response
+             
+            console.log(data)
+           }
+         });    
+});
+</script>
+{% endblock %}

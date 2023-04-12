@@ -1,0 +1,61 @@
+
+{%  extends "base.html" %}
+{% block content%}
+    <div class="alice-bg section-padding-bottom">
+      <div class="container">
+        <div class="row">
+          <div class="col">
+            <div class="blog-post-wrapper">
+              <div class="row">
+                {% if categories| length > 0 %}
+                {% for cat in categories %}
+                <div class="col-md-6 col-lg-4">
+                  <article class="blog-grid">
+                    <div class="thumb">
+                      <!-- /static/images/blog/thumb-1.jpg -->
+                      <img src="/static/images/blog/thumb-1.jpg" class="img-fluid" alt="">
+                    </div>
+                    <div class="body">
+                      <span class="date">{{cat['day']}} <span>{{cat['month']}}</span></span>
+                      
+                      <h3 style="padding-left: 5px;"><a href="{{cat['src']}}">{{cat['title']}}</a></h3>
+                      <p>{{cat['content'] | safe | truncate(110)  }}</p>
+                    </div>
+                    <div class="info">
+                      <span class="author"><a href="#"><i data-feather="user"></i>{{cat['author']}}</a></span>
+                      <span class="comments"><a href="#"><i data-feather="message-circle"></i>{{cat['commentcount']}}</a></span>
+                    </div>
+                  </article>
+                </div>
+                {% endfor %}
+                {%else%}
+               
+                  <h3>No News data in this category</h3>
+
+                
+                
+                {% endif %}
+
+              </div>
+              <div class="row">
+                <div class="col">
+                  <div class="pagination-list text-center">
+                    <!-- <nav class="navigation pagination padding-top-10">
+                      <div class="nav-links">
+                        <a class="prev page-numbers" href="#"><i class="fas fa-angle-left"></i></a>
+                        <a class="page-numbers" href="#">1</a>
+                        <span aria-current="page" class="page-numbers current">2</span>
+                        <a class="page-numbers" href="#">3</a>
+                        <a class="page-numbers" href="#">4</a>
+                        <a class="next page-numbers" href="#"><i class="fas fa-angle-right"></i></a>
+                      </div>
+                    </nav>                 -->
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+{% endblock %}
