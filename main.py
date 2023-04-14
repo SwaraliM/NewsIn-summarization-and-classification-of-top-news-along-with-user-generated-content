@@ -199,7 +199,7 @@ def index():
     for ele in news_listt:
         news = {}
         c = c+1
-        if(c>5):
+        if(c>10):
             break
         news_data = Article(ele.link.text)
         news_data.download()
