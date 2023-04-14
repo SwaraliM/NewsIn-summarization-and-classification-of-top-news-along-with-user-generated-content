@@ -2,6 +2,7 @@ import sys
 sys.path
 sys.executable
 from time import time
+from datetime import date
 from flask import *
 import hashlib
 import os
@@ -11,13 +12,13 @@ import requests
 import mysql.connector
 import random
 from flask_mail import Mail, Message
-from newsapi import NewsApiClient
+from newsapi.newsapi_client import NewsApiClient
 from flask_simple_geoip import SimpleGeoIP
 import openweather
 import datetime
 import re
 import pyrebase
-from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer 
+from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 from googletrans import Translator
 from flask import Markup
 from gensim.summarization.summarizer import summarize
@@ -34,6 +35,7 @@ import nltk
 # import COVID19Py
 import emailsender as ty
 from covid import Covid
+
 
 
 
@@ -96,15 +98,15 @@ classifier = pickle.load(pickle_in)
 
 #Firebase Config
 firebaseConfig = {
-   "apiKey": "AIzaSyDJFG8dMeK2oQEw29tCtgLT1TbBUEFc85U",
-  "authDomain": "newsin-1a9a9.firebaseapp.com",
+  "apiKey": "AIzaSyA1YkO00Tx46z-W_nma66Ij81Y1aK2Hz5Q",
+  "authDomain": "newsin-87f80.firebaseapp.com",
   "databaseURL":"",
-  "projectId": "newsin-1a9a9",
-  "storageBucket": "newsin-1a9a9.appspot.com",
-  "messagingSenderId": "1023350247427",
-  "appId": "1:1023350247427:web:c4618968072163a5377e36",
-  "measurementId": "G-1Z8269497F"
-  };
+  "projectId": "newsin-87f80",
+  "storageBucket": "newsin-87f80.appspot.com",
+  "messagingSenderId": "761992107649",
+  "appId": "1:761992107649:web:1d9fcccd4c3d96d3301f80",
+  "measurementId": "G-KLE9BQ52NM"
+};
 firebase = pyrebase.initialize_app(firebaseConfig)
 storage = firebase.storage()
 
@@ -123,23 +125,24 @@ simple_geoip = SimpleGeoIP(app)
 translator = Translator()
 
 # Email config
-app.config['MAIL_SERVER']='smtp.stackmail.com'
-app.config['MAIL_PORT'] = 587
-app.config['MAIL_USERNAME'] = 'mahimkarswarali@gmail.com'
-app.config['MAIL_PASSWORD'] = ''
-app.config['MAIL_USE_TLS'] = True
-app.config['MAIL_USE_SSL'] = False
+app.config['MAIL_SERVER']='smtp.gmail.com'
+app.config['MAIL_PORT'] = 465
+app.config['MAIL_USERNAME'] = 'pandeygshreya06@gmail.com'
+app.config['MAIL_PASSWORD'] = 'jysbowrjfvhddfjz'
+app.config['MAIL_USE_TLS'] = False
+app.config['MAIL_USE_SSL'] = True
 
 mail = Mail(app)
 # Mysql connection
 try:
-    database = mysql.connector.connect(
+    conn = mysql.connector.connect(
     host="localhost",
     user="root",
     password="",
     database="inshort_bharat"
     )
     print("Connection Success")
+    cursor=conn.cursor()
 except Exception as e:
     print(e)
 
@@ -180,16 +183,16 @@ def index():
     location = geoip_data['location']
     city = location['city']
     weather_data = get_weather("mumbai")
-    print(weather_data)
+    #print(weather_data)
     headline = ""
     all_headlines = newsapi.get_top_headlines(category="general",
     language='en',country="in")
     news_articles = all_headlines.get('articles')
-    print("news headlines", news_articles)
+    #print("news headlines", news_articles)
     for news in news_articles:
         headline += news['title'] + " "
     news_list = []
-    query = 'SELECT id, title, content, published_date, image, category, slug FROM news ORDER BY published_date ASC LIMIT 10'
+    query = 'SELECT id, title, content, published_date, image, category, slug FROM news ORDER BY published_date ASC LIMIT 50'
     
     news_listt = fetch_top_news()
     c = 0
@@ -223,20 +226,19 @@ def index():
 
 #date article reference : https://stackoverflow.com/questions/28189442/datetime-current-year-and-month-in-python
 '''
-   with database.cursor() as cursor:
-        cursor.execute(query)
-        db_data = cursor.fetchall()
-        for row in db_data:
-            news = {}
-            #print(row[1],row[2])
-            news['id'] = row[0]
-            news['title'] = row[1]
-            news['content'] = row[2]
-            news['date'] = row[3]
-            news['image'] = row[4]
-            news['category'] = row[5]
-            news['slug'] = row[6]
-            news_list.append(news)
+    cursor.execute(query)
+    db_data = cursor.fetchall()
+    for row in db_data:
+        news = {}
+        #print(row[1],row[2])
+        news['id'] = row[0]
+        news['title'] = row[1]
+        news['content'] = row[2]
+        news['date'] = row[3]
+        news['image'] = row[4]
+        news['category'] = row[5]
+        news['slug'] = row[6]
+        news_list.append(news)
  
 '''
 ##==========
@@ -344,24 +346,22 @@ def category_scrape(category_name):
                LEFT JOIN comments ON news.id = comments.post_id
                WHERE category = %s GROUP BY news.id, title, content, MONTHNAME(published_date), image, category, slug, users.name, DATE_FORMAT(published_date,"%D")"""
     print(query)
-    with database.cursor(buffered=True) as cursor:
-        cursor.execute(query,(category_namee,))
-        db_data = cursor.fetchall()
-        news = {}
-        for row in db_data:
-            print(row)
-            news['id'] = row[0]
-            news['title'] = row[1]
-            news['content'] = row[2]
-            news['month'] = row[3]
-            news['image'] = row[4]
-            news['category'] = row[5]
-            news['slug'] = row[6]
-            news['name'] = row[7]
-            news['commentcount'] = row[8]
-            news['day'] = row[9]
-
-            news_list.append(news)
+    cursor.execute(query,(category_namee,))
+    db_data = cursor.fetchall()
+    news = {}
+    for row in db_data:
+        print(row)
+        news['id'] = row[0]
+        news['title'] = row[1]
+        news['content'] = row[2]
+        news['month'] = row[3]
+        news['image'] = row[4]
+        news['category'] = row[5]
+        news['slug'] = row[6]
+        news['name'] = row[7]
+        news['commentcount'] = row[8]
+        news['day'] = row[9]
+        news_list.append(news)
 '''        
 
 ##=============
@@ -392,8 +392,28 @@ def news():
     #TODO: LIST NEWS recent
     news_list = []
     query = 'SELECT id, title, content, published_date, published_by, category, slug FROM news ORDER BY published_date ASC LIMIT 50'
+    cursor.execute(query)
+    db_data = cursor.fetchall()
     news_listt = fetch_top_news()
-    c = 0
+    c = 1
+
+    for ele in db_data:
+        news = {}
+        news['id'] = c
+        news['title'] = news[1]
+        news['content'] = news[2]
+        news['date'] = news[7]
+        news['image'] = news[3]
+        news['category'] = news[5]
+        news['src'] = news[4]
+        query='SELECT name from users WHERE id = '+ str(news[8])+''
+        cursor.execute(query)
+        author_name = cursor.fetchall()
+        news['author'] = author_name
+        news_list.append(news)
+        c=c+1
+
+
     for ele in news_listt:
         news = {}
         
@@ -401,7 +421,7 @@ def news():
         news_data.download()
         news_data.parse()
         news_data.nlp()
-        news['id'] = 1
+        news['id'] = c
         news['title'] = news_data.title
         news['content'] = news_data.summary
         news['date'] = ele.pubDate.text
@@ -410,7 +430,8 @@ def news():
         news['src'] = ele.link.text
         news['author'] = news_data.authors
         news_list.append(news)
-
+        c=c+1
+    
     return render_template("news/blog.html",news_list=news_list)
 
 ##==========
@@ -452,24 +473,23 @@ def dp(category,slug):
             """
     print(query)
     data = (slug, category)
-    with database.cursor(buffered=True) as cursor:
-        cursor.execute(query,data)
-        db_data = cursor.fetchall()
-        for row in db_data:
-            #print(row[1],row[2])
-            news['id'] = row[0]
-            news['title'] = row[1]
-            news['content'] = Markup(row[2])
-            news['date'] = row[3]
-            news['headerimg'] = row[4]
-            news['tags'] = row[5]
-            news['authorname'] = row[6]
-            news['authorimg'] = row[7]
-            news['facebook'] = row[8]
-            news['instagram'] = row[9]
-            news['linkedin'] = row[10]
-            news['twitter'] = row[11]
-            news['google'] = row[12]    
+    cursor.execute(query,data)
+    db_data = cursor.fetchall()
+    for row in db_data:
+        #print(row[1],row[2])
+        news['id'] = row[0]
+        news['title'] = row[1]
+        news['content'] = Markup(row[2])
+        news['date'] = row[3]
+        news['headerimg'] = row[4]
+        news['tags'] = row[5]
+        news['authorname'] = row[6]
+        news['authorimg'] = row[7]
+        news['facebook'] = row[8]
+        news['instagram'] = row[9]
+        news['linkedin'] = row[10]
+        news['twitter'] = row[11]
+        news['google'] = row[12]    
     
     if session.get("language",0):
         if session['language'] == 'Hindi':        
@@ -482,21 +502,20 @@ def dp(category,slug):
     print(news)
     nquery = "SELECT comments.id, users.name, comment, sentiment, timestamp, users.image_url, comments.user_id FROM comments LEFT JOIN users ON comments.user_id = users.id WHERE post_id = "+ str(news['id'])+""
                
-    with database.cursor(buffered=True) as cursor:
-        cursor.execute(nquery)
-        db_data = cursor.fetchall()
-        for row in db_data:
-            #print(row[1],row[2])
-            print(row)
-            comment = {}
-            comment['id'] = row[0]
-            comment['name'] = row[1]
-            comment['comment'] = row[2]
-            comment['sentiment'] = row[3]
-            comment['timestamp'] = row[4]
-            comment['user_img'] = row[5]
-            comment['user_id'] = row[6]
-            comment_list.append(comment)
+    cursor.execute(nquery)
+    db_data = cursor.fetchall()
+    for row in db_data:
+        #print(row[1],row[2])
+        print(row)
+        comment = {}
+        comment['id'] = row[0]
+        comment['name'] = row[1]
+        comment['comment'] = row[2]
+        comment['sentiment'] = row[3]
+        comment['timestamp'] = row[4]
+        comment['user_img'] = row[5]
+        comment['user_id'] = row[6]
+        comment_list.append(comment)
     print(comment_list)
     return render_template("news/blog-details.html",news=news,comments=comment_list)
 
@@ -518,31 +537,33 @@ def login():
         try:
             email = request.form['email']
             password = request.form['password']
-            # password = hashlib.md5(password.encode()).hexdigest()
-            print(email)
+            password = hashlib.md5(password.encode()).hexdigest()
             query = 'Select id, name, email, password, type, image_url from users where email = %s and password = %s'
             data = (email,password)
             print(data)
-            with database.cursor() as cursor:
-                cursor.execute(query,data)
-                db_data = cursor.fetchall()
-                for row in db_data:
-                    print("helpppppppppp")
-                    print(db_data)
-                    if row[2] == email and row[3] == password:
-                        print(row)
-                        session['user_id'] = row[0]
-                        session['name'] = row[1]
-                        session['email'] = email
-                        session['account_type'] = row[4]
-                        session['user_img'] = row[5]
-                        return redirect(url_for('admin-dashboard.html'))
-                        # return render_template("profile/admin/admin-dashboard.html")
+            cursor.execute(query,data)
+            db_data = cursor.fetchall()
+            for row in db_data:
+                print("inside")
+                if row[2] == email and row[3] == password:
+                    session['user_id'] = row[0]
+                    session['name'] = row[1]
+                    session['email'] = email
+                    session['account_type'] = row[4]
+                    session['user_img'] = row[5]
+                    print("account type:",row[4])
+                    return redirect(url_for('dashboard'))
+                    # if int(row[4])==1:
+                    #     print("Admin")
+                    #     return redirect(url_for('adashboard'))
+                    # else:
+                    #     return redirect(url_for('dashboard'))
+                    #return render_template("contactus.html")
                     
         except Exception as e:
             print(e)
-            database.rollback()
-            err = "some error occured! try again."     
+            conn.rollback()
+            err = "some error occured! try again."   
     return render_template("authentication/login.html")
 
 ##==========
@@ -558,7 +579,7 @@ def register():
         account_type = request.form['acc_type']
         OTP = random.randint(1000,9999)
         #send otp to user on email
-        print(OTP)
+        print("OTP:",OTP)
         user_info = {
             "name" : name,
             "email" : email,
@@ -566,11 +587,14 @@ def register():
             "account_type" : account_type,
             "OTP" : OTP
         }
+        print("Hey user")
         session['user_info'] = user_info
-        msg = Message('Here is OTP to verify!', sender = 'mahimkarswarali@gmail.com',
+        print(user_info)
+        msg = Message('Here is OTP to verify!', sender = 'newsin@gmail.com',
                                 recipients = [email])
-        msg.html = str(ty.giveHtml(str(OTP),name))
-        mail.send(msg)           
+        msg.body="Hii "+str(name)+",\nYour OTP is "+str(OTP)
+        mail.send(msg) 
+        print("Hii")          
         # except Exception as e:      
         #     print(e)      
         #     err = "some error occured! try again."
@@ -600,15 +624,14 @@ def verifyotp():
             #global database 
             query = "INSERT INTO users(name, email, password, type, image_url) VALUES (%s,%s,%s,%s,%s)"
             data = (user_info["name"], user_info["email"],user_info["password"],user_info["account_type"],"https://i.picsum.photos/id/1011/5472/3648.jpg?hmac=Koo9845x2akkVzVFX3xxAc9BCkeGYA9VRVfLE4f0Zzk")
-            with database.cursor() as cursor:
-                print("IN cursor")
-                cursor.execute(query,data)
-                database.commit()
+            print("IN cursor")
+            cursor.execute(query,data)
+            conn.commit()
             session.pop('user_info', None)
             return redirect(url_for('login'))
         # except Exception as e:
         #     print(e)
-            #database.rollback()
+            #conn.rollback()
     return render_template("authentication/verify.html")
 
 ##==========
@@ -647,9 +670,8 @@ def changefp():
             new_pass = hashlib.md5(new_pass.encode()).hexdigest()
             update_query = "UPDATE users SET password = %s WHERE email = %s"
             update_data = (new_pass,str(session["fpemail"]))
-            with database.cursor(buffered=True) as cursor:
-                cursor.execute(update_query,update_data)
-                database.commit()
+            cursor.execute(update_query,update_data)
+            conn.commit()
             return redirect(url_for('login'))        
         else:
             return render_template_string("Error Bad Person U")
@@ -671,6 +693,33 @@ def logout():
 ##? Account, Edit Account, View Bookmarked News, View Liked News, Account Preferences
 
 ##==========
+##TODO: USER and ADMIN Dashboard
+##==========
+@app.route('/dashboard')
+def dashboard():
+    #TODO: login Check
+    # If not true than redirect
+    if not loginCheck():
+        return redirect(url_for('login'))
+    
+    if int(session["account_type"])==0:
+        print("Not Admin")
+        return render_template("profile/dashboard.html")
+    else:
+        return render_template("profile/admin/admin-dashboard.html")
+
+##==========
+##TODO: User View News
+##==========
+@app.route('/viewnews')
+def viewnews():
+    #TODO: login Check
+    # If not true than redirect
+    if not loginCheck():
+        return redirect(url_for('login'))
+    return redirect(url_for("index"))
+
+##==========
 ##TODO: Account
 ##==========
 @app.route('/account')
@@ -681,20 +730,18 @@ def account():
         return redirect(url_for('login'))
     # List Favourites here
     user_id = session["user_id"]
-    query = "SELECT favorites.id, title, slug, news.category, timestamp FROM favorites LEFT JOIN news on favorites.post_id = news.id WHERE favorites.user_id = "+str(user_id)+""
-
-    with database.cursor(buffered=True) as cursor:
-        cursor.execute(query)
-        db_data = cursor.fetchall()
-        favourites = []
-        for row in db_data:
-            fav = {}
-            fav["id"] = row[0]
-            fav["title"] = row[1]
-            fav["slug"] = row[2]
-            fav["category"] = row[3]
-            fav["timestamp"] = row[4]
-            favourites.append(fav)
+    query = "SELECT favorites.id, title, slug, news.category, news.published_date FROM favorites LEFT JOIN news on favorites.post_id = news.id WHERE favorites.user_id = "+str(user_id)+""
+    cursor.execute(query)
+    db_data = cursor.fetchall()
+    favourites = []
+    for row in db_data:
+        fav = {}
+        fav["id"] = row[0]
+        fav["title"] = row[1]
+        fav["slug"] = row[2]
+        fav["category"] = row[3]
+        fav["timestamp"] = row[4]
+        favourites.append(fav)
         
     return render_template("profile/account.html",favs = favourites)
 ##==========
@@ -718,20 +765,20 @@ def viewbookmarked():
         return redirect(url_for('login'))
     # List Read Later here
     user_id = session["user_id"]
-    query = "SELECT readlater.id, title, slug, news.category, timestamp, news.image FROM readlater LEFT JOIN news on readlater.post_id = news.id WHERE readlater.user_id = "+str(user_id)+""
-    with database.cursor(buffered=True) as cursor:
-        cursor.execute(query)
-        db_data = cursor.fetchall()
-        readlaters = []
-        for row in db_data:
-            fav = {}
-            fav["id"] = row[0]
-            fav["title"] = row[1]
-            fav["slug"] = row[2]
-            fav["category"] = row[3]
-            fav["timestamp"] = row[4]
-            fav["image"] = row[5]
-            readlaters.append(fav)
+    query = "SELECT readlater.id, news.title, news.slug, news.category, news.published_date, news.image FROM readlater LEFT JOIN news on readlater.post_id = news.id WHERE readlater.user_id = "+str(user_id)+""
+    
+    cursor.execute(query)
+    db_data = cursor.fetchall()
+    readlaters = []
+    for row in db_data:
+        fav = {}
+        fav["id"] = row[0]
+        fav["title"] = row[1]
+        fav["slug"] = row[2]
+        fav["category"] = row[3]
+        fav["timestamp"] = row[4]
+        fav["image"] = row[5]
+        readlaters.append(fav)
     #make sure u copy the template or jinja2 part from favourites to here!
     return render_template("profile/dashboard-bookmark.html",readlaters = readlaters)
 
@@ -748,9 +795,8 @@ def at_fav(id):
     query = "INSERT INTO favorites(post_id, user_id) VALUES (%s,%s)"
     print(news_id,session['user_id'] )
     data = (news_id,session['user_id'])
-    with database.cursor() as cursor:
-        cursor.execute(query,data)
-        database.commit()   
+    cursor.execute(query,data)
+    conn.commit()   
     return jsonify({'msg':'Added To Fav'})
 ##==========
 ##TODO: Remove to Favourite
@@ -764,9 +810,8 @@ def rm_fav(id):
     news_id = id
     print(news_id, session["user_id"])
     query = "DELETE FROM favorites WHERE id = "+ str(news_id) +" AND user_id ="+ str(session["user_id"]) +""
-    with database.cursor() as cursor:
-        cursor.execute(query)
-        database.commit()   
+    cursor.execute(query)
+    conn.commit()   
     return jsonify({'msg':'Remove To Fav'})
 
 ##==========
@@ -782,9 +827,8 @@ def at_rl(id):
     query = "INSERT INTO readlater(post_id, user_id) VALUES (%s,%s)"
     print(news_id,session['user_id'] )
     data = (news_id,session['user_id'])
-    with database.cursor() as cursor:
-        cursor.execute(query,data)
-        database.commit()   
+    cursor.execute(query,data)
+    conn.commit()   
     return jsonify({'msg':'Added To Readlater'})
 
 ##==========
@@ -799,9 +843,8 @@ def rm_rl(id):
     news_id = id
     print(news_id, session["user_id"])
     query = "DELETE FROM readlater WHERE id = "+ str(news_id) +" AND user_id ="+ str(session["user_id"]) +""
-    with database.cursor() as cursor:
-        cursor.execute(query)
-        database.commit()   
+    cursor.execute(query)
+    conn.commit()   
     return jsonify({'msg':'Removed from Read Later'})
 
 
@@ -832,19 +875,17 @@ def changepassword():
 
         query = 'SELECT id, password from users WHERE id='+str(user_id)+''
         data = (int(user_id))
-        with database.cursor(buffered=True) as cursor:
-            cursor.execute(query)
-            db_data = cursor.fetchall()
-            for row in db_data:
-                if row[1] == password:
-                    #update with the new password
-                    update_query = "UPDATE users SET password = %s WHERE id = %s"
-                    update_data = (new_pass,user_id,)
-                    with database.cursor(buffered=True) as cursor:
-                        cursor.execute(update_query,update_data)
-                        database.commit()
-                    #return logout and relogin after password change
-                    return redirect(url_for('logout'))
+        cursor.execute(query)
+        db_data = cursor.fetchall()
+        for row in db_data:
+            if row[1] == password:
+                #update with the new password
+                update_query = "UPDATE users SET password = %s WHERE id = %s"
+                update_data = (new_pass,user_id,)
+                cursor.execute(update_query,update_data)
+                conn.commit()
+                #return logout and relogin after password change
+                return redirect(url_for('logout'))
     else:
         return "None"
 
@@ -871,10 +912,9 @@ def basicInfo():
         full_name = request.form['fname']
         query = "UPDATE users SET name=%s WHERE id=%s"
         data = (full_name,int(user_id))
-        with database.cursor(buffered=True) as cursor:
-            cursor.execute(query,data)
-            database.commit()
-            return "Success"
+        cursor.execute(query,data)
+        conn.commit()
+        return "Success"
     else:
         return "None"
 
@@ -899,10 +939,9 @@ def addProfileImage():
             storagePath = "profile/" + str(session["user_id"]) + "/"+ filename
             image_link = uploadImageFirebase(image,storagePath)
             data = (image_link,int(user_id))
-            with database.cursor(buffered=True) as cursor:
-                cursor.execute(query,data)
-                database.commit()
-                return "Success"
+            cursor.execute(query,data)
+            conn.commit()
+            return "Success"
     else:
         return "Not Updated"
 ##==========
@@ -924,10 +963,9 @@ def sociallinks():
         query = "UPDATE social SET facebook=%s, instagram=%s, twitter=%s, linkedin=%s, google=%s WHERE user_id = %s"
         #Get more data from form here
         data = (facebook, instagram,twitter,linkedin,google,int(user_id))
-        with database.cursor(buffered=True) as cursor:
-            cursor.execute(query,data)
-            database.commit()
-            return "Success"
+        cursor.execute(query,data)
+        conn.commit()
+        return "Success"
     else:
         return "None"   
 
@@ -948,18 +986,16 @@ def delaccount():
 
         query = "SELECT id, password, email from users WHERE id = "+ str(user_id)+""
         
-        with database.cursor(buffered=True) as cursor:
-            cursor.execute(query)
-            db_data = cursor.fetchall()
-            for row in db_data:
-                if row[1] == password and row[2] == session['email']:
-                    update_query = "DELETE from users WHERE id = "+ str(user_id)+""
-                    update_data = (user_id)
-                    with database.cursor(buffered=True) as cursor:
-                        cursor.execute(update_query)
-                        database.commit()
-                    #return logout and relogin after password change
-                    return redirect(url_for('logout'))
+        cursor.execute(query)
+        db_data = cursor.fetchall()
+        for row in db_data:
+            if row[1] == password and row[2] == session['email']:
+                update_query = "DELETE from users WHERE id = "+ str(user_id)+""
+                update_data = (user_id)
+                cursor.execute(update_query)
+                conn.commit()
+                #return logout and relogin after password change
+                return redirect(url_for('logout'))
     else:
         return redirect(url_for('index'))
 
@@ -967,6 +1003,16 @@ def delaccount():
 ##?TODO: Admin Profile & Dashboard Pages END
 ##? Account, Edit Account, Create News, Edit News, Account Preferences
 
+##==========
+##TODO: Admin View News
+##==========
+@app.route('/admin-viewnews')
+def aviewnews():
+    #TODO: login Check
+    # If not true than redirect
+    if not loginCheck():
+        return redirect(url_for('login'))
+    return redirect(url_for("index"))
 ##==========
 ##TODO: Admin Account
 ##==========
@@ -984,16 +1030,15 @@ def adminaccount():
     query = "SELECT id, title, published_date FROM news WHERE published_by =" + str(session['user_id']) +""
     recent_published_news = []
     
-    with database.cursor(buffered=True) as cursor:
-        cursor.execute(query)
-        data = cursor.fetchall()
-        for row in data:
-            news = {}
-            news['id'] = row[0]
-            news['title'] = row[1]
-            news['published_date'] = row[2]
-            print(row)
-            recent_published_news.append(news)
+    cursor.execute(query)
+    data = cursor.fetchall()
+    for row in data:
+        news = {}
+        news['id'] = row[0]
+        news['title'] = row[1]
+        news['published_date'] = row[2]
+        print(row)
+        recent_published_news.append(news)
             
     return render_template("profile/admin/admin-account.html",newslist=recent_published_news)
 
@@ -1010,16 +1055,15 @@ def admineditaccount():
     if int(session["account_type"]) != 1:
         return redirect(url_for("index"))
     query = "SELECT * FROM social WHERE user_id = " + str(session["user_id"]) + ""
-    with database.cursor() as cursor:
-        cursor.execute(query)
-        myresult = cursor.fetchall()
-        social = {}
-        for row in myresult:
-            social['facebook'] = row[2]
-            social['instagram'] = row[3]
-            social['twitter'] = row[4]
-            social['linkedin'] = row[5]
-            social['google'] = row[6]
+    cursor.execute(query)
+    myresult = cursor.fetchall()
+    social = {}
+    for row in myresult:
+        social['facebook'] = row[2]
+        social['instagram'] = row[3]
+        social['twitter'] = row[4]
+        social['linkedin'] = row[5]
+        social['google'] = row[6]
     return render_template("profile/admin/admin-dashboard-edit-profile.html",social=social)
 
 ##==========
@@ -1050,13 +1094,13 @@ def admincreatenews():
         content = request.form['content-news']
         locality = request.form['locality']
         send_bulk = request.form['bulk-email']
+        tdate=date.today()
         print(title,slug,category,content,locality,send_bulk,image_link)
         #TODO: News Insert
         query = "INSERT INTO news(title, content, image, slug, category, tags, published_by, location) VALUES (%s,%s,%s,%s,%s,%s,%s,%s)"
         data = (title,content,image_link,slug,category,tags,session['user_id'],locality)
-        with database.cursor() as cursor:
-            cursor.execute(query,data)
-            database.commit()
+        cursor.execute(query,data)
+        conn.commit()
         return "news created"
     
     return render_template("profile/admin/admin-dashboard-post-news.html")
@@ -1076,20 +1120,18 @@ def admineditnews():
     #TODO: Just list the news created by this user give options liked edit, delete and read
     query = "SELECT id, title, published_date, category, slug FROM news where published_by = "+ str(session["user_id"])+""
     createdby_news_list = []
-    with database.cursor(buffered=True) as cursor:
-        cursor.execute(query)
-        db_data = cursor.fetchall()
-        print(db_data)
-        for row in db_data:
-            news = {}
-            print(row)
-            news["id"] = row[0]
-            news["title"] = row[1]
-            news["date"] = row[2]
-            news["category"] = row[3]
-            news["slug"] = row[4]
-
-            createdby_news_list.append(news)
+    cursor.execute(query)
+    db_data = cursor.fetchall()
+    print(db_data)
+    for row in db_data:
+        news = {}
+        print(row)
+        news["id"] = row[0]
+        news["title"] = row[1]
+        news["date"] = row[2]
+        news["category"] = row[3]
+        news["slug"] = row[4]
+        createdby_news_list.append(news)
             
     return render_template("profile/admin/admin-dashboard-manage-news.html",newslist=createdby_news_list)
 
@@ -1109,15 +1151,14 @@ def admineditnewsdata(nid):
     query = "SELECT title, content, image, category, tags FROM news where id =" + str(nid) + " AND published_by = " + str(session['user_id']) + ""
     news = {}
     news["id"] = nid
-    with database.cursor(buffered=True) as cursor:
-        cursor.execute(query)
-        db_data = cursor.fetchall()
-        for row in db_data:
-            news["title"] = row[0]
-            news["content"] = row[1]
-            news["image"] = row[2]
-            news["category"] = row[3]
-            news["tags"] = row[4]
+    cursor.execute(query)
+    db_data = cursor.fetchall()
+    for row in db_data:
+        news["title"] = row[0]
+        news["content"] = row[1]
+        news["image"] = row[2]
+        news["category"] = row[3]
+        news["tags"] = row[4]
     return render_template("profile/admin/admin-dashboard-edit-news.html",news=news)
 
 @app.route('/editnewsdata',methods=['POST'])
@@ -1150,9 +1191,8 @@ def newsdata():
             print(title,category,content,image_link,tags,id)
             query = "UPDATE news SET title = %s , content = %s , image = %s , category = %s, tags = %s WHERE id = " + str(id) + " AND published_by = " + str(session['user_id'])+ ""
             data = (title,content,image_link,category,tags)
-            with database.cursor() as cursor:
-                cursor.execute(query,data)
-                database.commit()
+            cursor.execute(query,data)
+            conn.commit()
         except Exception as e:
             print(e)
     return "Success"
@@ -1173,10 +1213,9 @@ def deletenews(nid):
         news_id = nid
         query = "DELETE FROM news WHERE id=%s AND published_by = %s"
         data = (news_id,session['user_id'])
-        with database.cursor() as cursor:
-            cursor.execute(query,data)
-            database.commit()
-            return "Success"
+        cursor.execute(query,data)
+        conn.commit()
+        return "Success"
 
 ##?
 ##?TODO: Admin Profile & Dashboard Pages END
@@ -1199,19 +1238,18 @@ def addComment():
         sentiment = sentiment_scores(comment)
         query = "INSERT INTO comments(post_id, user_id, comment, sentiment) VALUES (%s,%s,%s,%s)"
         data = (news_id,session['user_id'],comment,sentiment)
-        with database.cursor() as cursor:
-            cursor.execute(query,data)
-            database.commit()
-            print(cursor)
-            id = cursor.lastrowid
-            msg = {
-                "id": id,
-                "comment" : comment,
-                "sentiment" : sentiment,
-                "user_img" : session['user_img'],
-                "user_name" : session['name'],
-            }
-            return jsonify(msg)
+        cursor.execute(query,data)
+        conn.commit()
+        print(cursor)
+        id = cursor.lastrowid
+        msg = {
+            "id": id,
+            "comment" : comment,
+            "sentiment" : sentiment,
+            "user_img" : session['user_img'],
+            "user_name" : session['name'],
+        }
+        return jsonify(msg)
 
 @app.route("/edit-comment",methods=['POST'])
 def editComment():
@@ -1226,10 +1264,9 @@ def editComment():
         sentiment = sentiment_scores(comment)
         query = "UPDATE comments SET comment=%s, sentiment=%s WHERE id = %s"
         data = (comment,sentiment,int(comment_id))
-        with database.cursor() as cursor:
-            cursor.execute(query,data)
-            database.commit()
-            return "Success"
+        cursor.execute(query,data)
+        conn.commit()
+        return "Success"
 @app.route("/delete-comment",methods=['POST'])
 def deleteComment():
     #TODO: session login check not implemented
@@ -1241,10 +1278,9 @@ def deleteComment():
         print(comment_id)
         query = "DELETE FROM comments WHERE id="+ comment_id+  ""
         
-        with database.cursor() as cursor:
-            cursor.execute(query)
-            database.commit()
-            return "Success"
+        cursor.execute(query)
+        conn.commit()
+        return "Success"
 
 def listComments(news_id):
     """
@@ -1256,19 +1292,18 @@ def listComments(news_id):
                ON comments.user_id = users.id 
                WHERE post_id = %s"""
     data = (int(news_id))
-    with database.cursor(buffered=True) as cursor:
-        cursor.execute(query,data)
-        db_data = cursor.fetchall()
-        comments = []
-        for row in db_data:
-            single_comment = {}
-            single_comment["comment_id"] = row[0]
-            single_comment["name"] = row[1]
-            single_comment["comment"] = row[2]
-            single_comment["sentiment"] = row[3]
-            single_comment["timestamp"] = row[4]
-            comments.append(single_comment)
-            #print(row)
+    cursor.execute(query,data)
+    db_data = cursor.fetchall()
+    comments = []
+    for row in db_data:
+        single_comment = {}
+        single_comment["comment_id"] = row[0]
+        single_comment["name"] = row[1]
+        single_comment["comment"] = row[2]
+        single_comment["sentiment"] = row[3]
+        single_comment["timestamp"] = row[4]
+        comments.append(single_comment)
+        #print(row)
         total_count = len(comments)
     return (comments,total_count)
 
@@ -1284,10 +1319,9 @@ def reportComment():
         comment_id = request.form["comment_id"]
         query = "UPDATE comments SET reports= ( reports + 1 ) WHERE id=%s"
         data = (int(comment_id))
-        with database.cursor() as cursor:
-            cursor.execute(query,data)
-            database.commit()
-            return "Success"
+        cursor.execute(query,data)
+        conn.commit()
+        return "Success"
 
 @app.route('/rm-report-comment',methods=['GET','POST'])
 def removeReport():
@@ -1299,10 +1333,9 @@ def removeReport():
         comment_id = request.form["comment_id"]
         query = "UPDATE comments SET reports= ( reports - 1 ) WHERE id=%s"
         data = (comment_id)
-        with database.cursor() as cursor:
-            cursor.execute(query,data)
-            database.commit()
-            return "Success"
+        cursor.execute(query,data)
+        conn.commit()
+        return "Success"
 
 ##?
 ##?TODO: Comments CRUDE END
@@ -1327,10 +1360,9 @@ def newsletter():
         print(email)
         query = "INSERT INTO newsletter(email) values (%s)"
         data = (email,)
-        with database.cursor() as cursor:
-            cursor.execute(query,data)
-            database.commit()
-            return "Success"
+        cursor.execute(query,data)
+        conn.commit()
+        return "Success"
     return "Thanks!"
 
 ##
@@ -1433,12 +1465,11 @@ def classifyNews(news):
 def sendBulkEmail():
     query = "select email from newsletter"
     receivers = []
-    with database.cursor(buffered=True) as cursor:
-            cursor.execute(query)
-            db_data = cursor.fetchall()
-            for row in db_data:
-                print(row[0])
-                receivers.append(row[0])
+    cursor.execute(query)
+    db_data = cursor.fetchall()
+    for row in db_data:
+        print(row[0])
+        receivers.append(row[0])
     #send email from here
     msg = Message('Hello', sender = 'sem6@newsin.com', recipients = receivers)
     msg.body = "Hello Flask message sent from Flask-Mail"
