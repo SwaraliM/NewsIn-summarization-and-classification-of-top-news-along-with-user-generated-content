@@ -127,8 +127,8 @@ translator = Translator()
 # Email config
 app.config['MAIL_SERVER']='smtp.gmail.com'
 app.config['MAIL_PORT'] = 465
-app.config['MAIL_USERNAME'] = 'pandeygshreya06@gmail.com'
-app.config['MAIL_PASSWORD'] = 'jysbowrjfvhddfjz'
+app.config['MAIL_USERNAME'] = 'newsinproject@gmail.com'
+app.config['MAIL_PASSWORD'] = 'cmhiudhkeeaaphut'
 app.config['MAIL_USE_TLS'] = False
 app.config['MAIL_USE_SSL'] = True
 
@@ -590,7 +590,7 @@ def register():
         print("Hey user")
         session['user_info'] = user_info
         print(user_info)
-        msg = Message('Here is OTP to verify!', sender = 'newsin@gmail.com',
+        msg = Message('Here is OTP to verify!', sender = 'newsinproject@gmail.com',
                                 recipients = [email])
         msg.body="Hii "+str(name)+",\nYour OTP is "+str(OTP)
         mail.send(msg) 
