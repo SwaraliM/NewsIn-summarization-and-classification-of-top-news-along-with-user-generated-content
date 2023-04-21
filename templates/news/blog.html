@@ -1,32 +1,30 @@
-
 {% extends "base.html" %}
 {% block content %}
-    <div class="alice-bg section-padding-bottom">
-      <div class="container">
-        <div class="row">
-          <div class="col">
-            
-            <div class="blog-post-wrapper">
-            
-              {% for news in news_list %}
-              <article class="blog-list">
-                <div class="info">
-                  <span class="date">{{news['date'] | truncate(17, True, '') }}</span>
-                </div>
-                <div class="content">
-                  <h3><a href="">{{news['title']}}</a></h3>
+<div class="alice-bg section-padding-bottom">
+  <div class="container">
+    <div class="row">
+      <div class="col">
 
-                  <p>{{news['content'] | news_summarizer}}</p>
-            
-                </div>
-                <div class="read-more">
-                  <a href="{{ news['src'] }}" class="button">Read More</a>
-                </div>
-              </article>
-              {% endfor %}
-              
+        <div class="blog-post-wrapper">
 
-              <!-- <div class="pagination-list text-center">
+          {% for news in news_list %}
+          <article class="blog-list">
+            <div class="info">
+              <span class="date">{{news['date'] }}</span>
+            </div>
+            <div class="content">
+              <h3><a href="">{{news['title']}}</a></h3>
+
+              <p>{{news['content'] | news_summarizer}}</p>
+
+            </div>
+            <div class="read-more">
+              <a href="dp/{{news['category']}}/{{news['slug']}}" class="button">Read More</a>
+            </div>
+          </article>
+          {% endfor %}
+
+          <!-- <div class="pagination-list text-center">
                 <nav class="navigation pagination">
                   <div class="nav-links">
                     <a class="prev page-numbers" href="#"><i class="fas fa-angle-left"></i></a>
@@ -38,10 +36,22 @@
                   </div>
                 </nav>                
               </div> -->
-            </div>
-          </div>
         </div>
       </div>
     </div>
+  </div>
+</div>
+
+<script>
+  function openNewFile(src,category,slug) {
+    console.log(src);
+    if (src.startsWith('http')) {
+      window.location.href = src;
+    } else {
+      window.location.href = 'dp/' + category + '/' + slug;
+    }
+
+  }
+</script>
 
 {% endblock %}

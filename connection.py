@@ -40,7 +40,7 @@ def create_db():
     id INT NOT NULL AUTO_INCREMENT,
     post_id INT NOT NULL,
     user_id INT NOT NULL,
-    timesatmp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (id),
     FOREIGN KEY (post_id) REFERENCES news(id),
     FOREIGN KEY (user_id) REFERENCES users(id));''')
@@ -50,7 +50,7 @@ def create_db():
     id INT PRIMARY KEY AUTO_INCREMENT,
     post_id INT NOT NULL,
     user_id INT NOT NULL,
-    timesatmp TIMESTAMP DEFAULT CURRENT_TIMESTAMP); ''')
+    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP); ''')
     con.commit()
 
     cursor.execute('''CREATE TABLE comments (
@@ -58,6 +58,7 @@ def create_db():
   post_id INT NOT NULL,
   user_id INT NOT NULL,
   comment TEXT NOT NULL,
+  timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   sentiment VARCHAR(255) NOT NULL); ''')
     con.commit()
 

@@ -96,10 +96,11 @@
           </div>
           <div class="read-more">
           
-              
+            {% if session['user_id'] %}  
             <a href="/at-rl/{{news['id']}}" class="button rl">Read later</a>
-            
-      
+            {%else%}
+            <a href="" class="button rl">Read later</a>
+            {% endif %}
             <button style="margin-top: 5px;" class="button"><a href="{{  news['src'] }}">Read More</a> </button>
 
 
@@ -159,9 +160,9 @@
               </a>
             </div>
             <div class="body">
-              <h4><a href="/category/{{category['name']}}">{{category['name']|upper}}</a></h4>
+              <h4><a href="/{{category['name']}}">{{category['name']|upper}}</a></h4>
               
-              <a href="/category/{{category['name']}}" class="button">{{ range(1, 10) | random }} News</a>
+              <a href="/{{category['name']}}" class="button">Watch News</a>
             </div>
           </div>
           {% endfor %}
