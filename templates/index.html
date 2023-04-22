@@ -101,8 +101,11 @@
             {%else%}
             <a href="" class="button rl">Read later</a>
             {% endif %}
+            {% if news['src'].startswith('http')%}
             <button style="margin-top: 5px;" class="button"><a href="{{  news['src'] }}">Read More</a> </button>
-
+            {%else%}
+            <button style="margin-top: 5px;" class="button"><a href="dp/{{news['category']}}/{{news['slug']}}">Read More</a> </button>
+            {% endif %}
 
 
             <br />

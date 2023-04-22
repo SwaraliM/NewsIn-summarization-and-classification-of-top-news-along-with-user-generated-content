@@ -256,7 +256,7 @@ def index():
         news['date'] = ele[3]
         news['image'] = ele[4]
         news['category'] = ele[5]
-        news['src'] = ele[0]
+        news['src'] = ""
         news['slug']=ele[6]
         query='SELECT name from users WHERE id = '+ str(ele[7])+''
         cursor.execute(query)
@@ -584,8 +584,8 @@ def dp(category,slug):
         comment['comment'] = row[2]
         comment['sentiment'] = row[3]
         comment['timestamp'] = row[4]
-        comment['user_img'] = row[4]
-        comment['user_id'] = row[5]
+        comment['user_img'] = row[5]
+        comment['user_id'] = row[6]
         comment_list.append(comment)
     return render_template("news/blog-details.html",news=news,comments=comment_list)
 
@@ -761,7 +761,7 @@ def dashboard():
         print("Not Admin")
         return redirect(url_for('account'))
     else:
-        return redirect(url_for('admin-account'))
+        return redirect(url_for('adminaccount'))
 
 ##==========
 ##TODO: User View News
@@ -1067,7 +1067,7 @@ def aviewnews():
 ##==========
 ##TODO: Admin Account
 ##==========
-@app.route('/admin-account')
+@app.route('/adminaccount')
 def adminaccount():
     # If not true than redirect
     if not loginCheck():
