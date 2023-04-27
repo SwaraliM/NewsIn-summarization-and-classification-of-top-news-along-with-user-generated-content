@@ -653,7 +653,7 @@ def register():
         session['user_info'] = user_info
         msg = Message('Here is OTP to verify!', sender = 'newsinproject@gmail.com',
                                 recipients = [email])
-        # msg.body="Hii "+str(name)+",\nYour OTP is "+str(OTP)
+        msg.body="Hii "+str(name)+",\nYour OTP is "+str(OTP)
         mail.send(msg)        
         # except Exception as e:      
         #     print(e)      
