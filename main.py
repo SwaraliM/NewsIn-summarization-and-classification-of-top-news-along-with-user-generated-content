@@ -1469,12 +1469,12 @@ def url_gen(url):
 @app.template_filter()
 def news_summarizer(data):
     """Gives summary"""
-    
+
     data = bs4.BeautifulSoup(data,'html.parser')
     news = data.text
     try:
         summary = summarize(news)
-        summary = news
+        # summary = news
     except ValueError:
         summary = "This News cant be summarize"
     return summary
@@ -1507,9 +1507,9 @@ def sendBulkEmail():
     cursor.execute(query)
     db_data = cursor.fetchall()
     for row in db_data:
-        receivers.append(row[0])
+        receivers.append(row[0]) 
     #send email from here
-    msg = Message('Hello', sender = 'sem6@newsin.com', recipients = receivers)
+    msg = Message('Hello', sender = 'newsinproject@gmail.com', recipients = receivers)
     msg.body = "Hello Flask message sent from Flask-Mail"
     mail.send(msg)
 
